@@ -1,6 +1,6 @@
 # swag-labs-ui-tests
 
-This repository contains the code for an automated testing suite using Cypress. This README will guide you through the project setup and how to use the provided NPM scripts.
+This repository contains the code for an automated testing suite using Cypress for the application hosted in https://www.saucedemo.com/. This README will guide you through the project setup and how to use the provided NPM scripts.
 
 ## Prerequisites
 
