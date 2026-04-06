@@ -6,13 +6,9 @@ class LoginPage {
     errorMessage: '[data-test="error"]',
   };
 
-  URLS = {
-    login: 'https://www.saucedemo.com/',
-  };
-
   visit() {
     cy.visit('/');
-    cy.url().should('eq', this.URLS.login);
+    cy.location('pathname').should('eq', '/');
   }
 
   fillUsername(username) {

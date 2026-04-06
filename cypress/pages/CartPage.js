@@ -4,10 +4,6 @@ class CartPage {
     checkoutButton: '[data-test="checkout"]',
   };
 
-  URLS = {
-    checkoutStepOne: 'https://www.saucedemo.com/checkout-step-one.html',
-  };
-
   validateItemIsInCart(itemName) {
     cy.get(this.SELECTORS.inventoryItemNames).should('contain.text', itemName);
   }
@@ -17,7 +13,7 @@ class CartPage {
       .should('be.visible')
       .and('not.be.disabled')
       .click();
-    cy.url().should('eq', this.URLS.checkoutStepOne);
+    cy.location('pathname').should('eq', '/checkout-step-one.html');
   }
 }
 

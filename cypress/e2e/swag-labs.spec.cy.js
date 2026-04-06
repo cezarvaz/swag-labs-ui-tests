@@ -3,17 +3,27 @@ import CheckoutPage from '../pages/CheckoutPage';
 import InventoryPage from '../pages/InventoryPage';
 import LoginPage from '../pages/LoginPage';
 
+const successfulUsers = [
+  'standard_user',
+  'problem_user',
+  'performance_glitch_user',
+  'error_user',
+  'visual_user',
+];
+
 describe('Swag Labs website', () => {
-  beforeEach(() => {
-    cy.stubThirdPartyRequests();
-    LoginPage.visit();
-  });
-
   describe('Login', () => {
-    it('login with standard_user successfully', () => {
-      LoginPage.login('standard_user', 'secret_sauce');
+    beforeEach(() => {
+      cy.stubThirdPartyRequests();
+      LoginPage.visit();
+    });
 
-      InventoryPage.validatePageIsVisible();
+    successfulUsers.forEach((username) => {
+      it(`login with ${username} successfully`, () => {
+        LoginPage.login(username, 'secret_sauce');
+
+        InventoryPage.validatePageIsVisible();
+      });
     });
 
     it('login with locked_out_user unsuccessfully', () => {
@@ -47,6 +57,8 @@ describe('Swag Labs website', () => {
 
   describe('Authenticated user flows', () => {
     beforeEach(() => {
+      cy.stubThirdPartyRequests();
+      LoginPage.visit();
       cy.loginAs();
       InventoryPage.validatePageIsVisible();
     });

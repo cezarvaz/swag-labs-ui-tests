@@ -1,14 +1,7 @@
 import '@testing-library/cypress/add-commands';
 import LoginPage from '../pages/LoginPage';
 
-let isThirdPartyExceptionHandlerRegistered = false;
-
 Cypress.Commands.add('stubThirdPartyRequests', () => {
-  if (!isThirdPartyExceptionHandlerRegistered) {
-    Cypress.on('uncaught:exception', () => false);
-    isThirdPartyExceptionHandlerRegistered = true;
-  }
-
   const blockedHosts = [
     'googletagmanager.com',
     'google-analytics.com',
@@ -45,7 +38,6 @@ Cypress.Commands.add('stubThirdPartyRequests', () => {
 Cypress.Commands.add(
   'loginAs',
   (username = 'standard_user', password = 'secret_sauce') => {
-    LoginPage.visit();
     LoginPage.login(username, password);
   },
 );

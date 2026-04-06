@@ -18,15 +18,8 @@ class InventoryPage {
     backToProductsButton: '[data-test="back-to-products"]',
   };
 
-  URLS = {
-    inventory: 'https://www.saucedemo.com/inventory.html',
-    cart: 'https://www.saucedemo.com/cart.html',
-    login: 'https://www.saucedemo.com/',
-    backpackDetails: 'https://www.saucedemo.com/inventory-item.html?id=4',
-  };
-
   validatePageIsVisible() {
-    cy.url().should('eq', this.URLS.inventory);
+    cy.location('pathname').should('eq', '/inventory.html');
     cy.get(this.SELECTORS.pageTitle)
       .should('be.visible')
       .and('have.text', 'Products');
@@ -66,12 +59,13 @@ class InventoryPage {
 
   openCart() {
     cy.get(this.SELECTORS.cartLink).should('be.visible').click();
-    cy.url().should('eq', this.URLS.cart);
+    cy.location('pathname').should('eq', '/cart.html');
   }
 
   openBackpackDetails() {
     cy.get(this.SELECTORS.backpackItemName).should('be.visible').click();
-    cy.url().should('eq', this.URLS.backpackDetails);
+    cy.location('pathname').should('eq', '/inventory-item.html');
+    cy.location('search').should('eq', '?id=4');
   }
 
   validateBackpackDetails() {
@@ -88,7 +82,7 @@ class InventoryPage {
       .should('be.visible')
       .and('not.be.disabled')
       .click();
-    cy.url().should('eq', this.URLS.inventory);
+    cy.location('pathname').should('eq', '/inventory.html');
   }
 
   sortProductsBy(option) {
@@ -96,7 +90,7 @@ class InventoryPage {
   }
 
   validateProductsSortedByPriceAsc() {
-    cy.get(this.SELECTORS.inventoryItemPrices).then(($prices) => {
+    cy.get(this.SELECTORS.inventoryItemPrices).should(($prices) => {
       const prices = [...$prices].map((price) =>
         Number.parseFloat(price.innerText.replace('$', '')),
       );
@@ -107,7 +101,7 @@ class InventoryPage {
   }
 
   validateProductsSortedByNameDesc() {
-    cy.get(this.SELECTORS.inventoryItemNames).then(($names) => {
+    cy.get(this.SELECTORS.inventoryItemNames).should(($names) => {
       const names = [...$names].map((name) => name.innerText.trim());
       const sortedNames = [...names].sort((first, second) =>
         second.localeCompare(first),
@@ -124,7 +118,7 @@ class InventoryPage {
   logout() {
     this.openMenu();
     cy.get(this.SELECTORS.logoutLink).should('be.visible').click();
-    cy.url().should('eq', this.URLS.login);
+    cy.location('pathname').should('eq', '/');
   }
 }
 

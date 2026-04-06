@@ -16,12 +16,6 @@ class CheckoutPage {
     summaryTotalLabel: '[data-test="total-label"]',
   };
 
-  URLS = {
-    cart: 'https://www.saucedemo.com/cart.html',
-    checkoutStepTwo: 'https://www.saucedemo.com/checkout-step-two.html',
-    checkoutComplete: 'https://www.saucedemo.com/checkout-complete.html',
-  };
-
   fillInformation({ firstName, lastName, postalCode }) {
     if (firstName) {
       cy.get(this.SELECTORS.firstNameInput).should('be.visible').clear();
@@ -53,7 +47,7 @@ class CheckoutPage {
   }
 
   validateOverviewPage() {
-    cy.url().should('eq', this.URLS.checkoutStepTwo);
+    cy.location('pathname').should('eq', '/checkout-step-two.html');
     cy.get(this.SELECTORS.summaryContainer).should('be.visible');
   }
 
@@ -80,11 +74,11 @@ class CheckoutPage {
       .should('be.visible')
       .and('not.be.disabled')
       .click();
-    cy.url().should('eq', this.URLS.cart);
+    cy.location('pathname').should('eq', '/cart.html');
   }
 
   validateCheckoutComplete() {
-    cy.url().should('eq', this.URLS.checkoutComplete);
+    cy.location('pathname').should('eq', '/checkout-complete.html');
     cy.get(this.SELECTORS.completeContainer).should('be.visible');
     cy.get(this.SELECTORS.completeHeader)
       .should('be.visible')
