@@ -6,6 +6,7 @@ module.exports = defineConfig({
   screenshotOnRunFailure: true,
   video: false,
   chromeWebSecurity: false,
+  allowCypressEnv: false,
   reporter: 'cypress-mochawesome-reporter',
   reporterOptions: {
     reportDir: 'cypress/reports',

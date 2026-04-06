@@ -1,10 +1,12 @@
 import '@testing-library/cypress/add-commands';
 import LoginPage from '../pages/LoginPage';
 
+let isThirdPartyExceptionHandlerRegistered = false;
+
 Cypress.Commands.add('stubThirdPartyRequests', () => {
-  if (!Cypress.env('thirdPartyExceptionHandlerRegistered')) {
+  if (!isThirdPartyExceptionHandlerRegistered) {
     Cypress.on('uncaught:exception', () => false);
-    Cypress.env('thirdPartyExceptionHandlerRegistered', true);
+    isThirdPartyExceptionHandlerRegistered = true;
   }
 
   const blockedHosts = [
