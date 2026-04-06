@@ -1,65 +1,167 @@
-import SwagLabsActions from '../actions/SwagLabsActions';
+import CartPage from '../pages/CartPage';
+import CheckoutPage from '../pages/CheckoutPage';
+import InventoryPage from '../pages/InventoryPage';
+import LoginPage from '../pages/LoginPage';
 
 describe('Swag Labs website', () => {
   beforeEach(() => {
-    SwagLabsActions.swagLabsPage();
+    cy.stubThirdPartyRequests();
+    LoginPage.visit();
   });
 
-  it('login with standard_user successfully', () => {
-    SwagLabsActions.login('standard_user', 'secret_sauce');
+  describe('Login', () => {
+    it('login with standard_user successfully', () => {
+      LoginPage.login('standard_user', 'secret_sauce');
 
-    SwagLabsActions.validateShopCartIsVisible();
+      InventoryPage.validatePageIsVisible();
+    });
+
+    it('login with locked_out_user unsuccessfully', () => {
+      LoginPage.login('locked_out_user', 'secret_sauce');
+
+      LoginPage.validateErrorMessage(
+        'Epic sadface: Sorry, this user has been locked out.',
+      );
+    });
+
+    it('username field not filled', () => {
+      LoginPage.fillPassword('secret_sauce');
+      LoginPage.submit();
+
+      LoginPage.validateErrorMessage('Epic sadface: Username is required');
+    });
+
+    it('password field not filled', () => {
+      LoginPage.fillUsername('standard_user');
+      LoginPage.submit();
+
+      LoginPage.validateErrorMessage('Epic sadface: Password is required');
+    });
+
+    it('username and password fields not filled', () => {
+      LoginPage.submit();
+
+      LoginPage.validateErrorMessage('Epic sadface: Username is required');
+    });
   });
 
-  it('login with problem_user successfully', () => {
-    SwagLabsActions.login('problem_user', 'secret_sauce');
+  describe('Authenticated user flows', () => {
+    beforeEach(() => {
+      cy.loginAs();
+      InventoryPage.validatePageIsVisible();
+    });
 
-    SwagLabsActions.validateShopCartIsVisible();
-  });
+    it('sorts products by price from low to high', () => {
+      InventoryPage.sortProductsBy('lohi');
 
-  it('login with performance_glitch_user successfully', () => {
-    SwagLabsActions.login('performance_glitch_user', 'secret_sauce');
+      InventoryPage.validateProductsSortedByPriceAsc();
+    });
 
-    SwagLabsActions.validateShopCartIsVisible();
-  });
+    it('sorts products by name from z to a', () => {
+      InventoryPage.sortProductsBy('za');
 
-  it('login with error_user successfully', () => {
-    SwagLabsActions.login('error_user', 'secret_sauce');
+      InventoryPage.validateProductsSortedByNameDesc();
+    });
 
-    SwagLabsActions.validateShopCartIsVisible();
-  });
+    it('adds and removes a product from the cart on the inventory page', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.validateCartBadgeCount(1);
 
-  it('login with visual_user successfully', () => {
-    SwagLabsActions.login('visual_user', 'secret_sauce');
+      InventoryPage.removeBackpackFromCart();
+      InventoryPage.validateCartBadgeIsNotVisible();
+    });
 
-    SwagLabsActions.validateShopCartIsVisible();
-  });
+    it('adds a product to the cart and shows it in the cart page', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.openCart();
 
-  it('login with locked_out_user unsuccessfully', () => {
-    SwagLabsActions.login('locked_out_user', 'secret_sauce');
+      CartPage.validateItemIsInCart('Sauce Labs Backpack');
+    });
 
-    SwagLabsActions.validateErrorMessage(
-      'Epic sadface: Sorry, this user has been locked out.',
-    );
-  });
+    it('keeps cart state after page reload', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.validateCartBadgeCount(1);
 
-  it('username field not filled', () => {
-    SwagLabsActions.passwordField('secret_sauce');
-    SwagLabsActions.loginButton();
+      InventoryPage.reloadPage();
 
-    SwagLabsActions.validateErrorMessage('Epic sadface: Username is required');
-  });
+      InventoryPage.validateCartBadgeCount(1);
+    });
 
-  it('password field not filled', () => {
-    SwagLabsActions.usernameField('standard_user');
-    SwagLabsActions.loginButton();
+    it('opens the product details page and navigates back to inventory', () => {
+      InventoryPage.openBackpackDetails();
+      InventoryPage.validateBackpackDetails();
 
-    SwagLabsActions.validateErrorMessage('Epic sadface: Password is required');
-  });
+      InventoryPage.goBackToProducts();
+      InventoryPage.validatePageIsVisible();
+    });
 
-  it('username and password fields not filled', () => {
-    SwagLabsActions.loginButton();
+    it('shows an error when first name is missing during checkout', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.openCart();
+      CartPage.proceedToCheckout();
+      CheckoutPage.fillInformation({
+        lastName: 'Vaz',
+        postalCode: '01001-000',
+      });
+      CheckoutPage.continue();
 
-    SwagLabsActions.validateErrorMessage('Epic sadface: Username is required');
+      CheckoutPage.validateInformationError('Error: First Name is required');
+    });
+
+    it('shows an error when last name is missing during checkout', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.openCart();
+      CartPage.proceedToCheckout();
+      CheckoutPage.fillInformation({
+        firstName: 'Cezar',
+        postalCode: '01001-000',
+      });
+      CheckoutPage.continue();
+
+      CheckoutPage.validateInformationError('Error: Last Name is required');
+    });
+
+    it('shows an error when checkout information is incomplete', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.openCart();
+      CartPage.proceedToCheckout();
+      CheckoutPage.fillInformation({
+        firstName: 'Cezar',
+        lastName: 'Vaz',
+      });
+      CheckoutPage.continue();
+
+      CheckoutPage.validateInformationError('Error: Postal Code is required');
+    });
+
+    it('completes checkout successfully', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.openCart();
+      CartPage.proceedToCheckout();
+      CheckoutPage.fillInformation({
+        firstName: 'Cezar',
+        lastName: 'Vaz',
+        postalCode: '01001-000',
+      });
+      CheckoutPage.continue();
+      CheckoutPage.validateOverviewPage();
+      CheckoutPage.validateOverviewForBackpack();
+      CheckoutPage.finish();
+
+      CheckoutPage.validateCheckoutComplete();
+    });
+
+    it('returns to the cart when checkout is cancelled', () => {
+      InventoryPage.addBackpackToCart();
+      InventoryPage.openCart();
+      CartPage.proceedToCheckout();
+
+      CheckoutPage.cancel();
+      CartPage.validateItemIsInCart('Sauce Labs Backpack');
+    });
+
+    it('logs out successfully from the inventory page', () => {
+      InventoryPage.logout();
+    });
   });
 });

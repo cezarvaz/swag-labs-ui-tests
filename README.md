@@ -6,7 +6,7 @@ This repository contains the code for an automated testing suite using Cypress f
 
 Before you get started, make sure you have the following software installed on your machine:
 
-- [Node.js](https://nodejs.org/) (v14 or higher)
+- [Node.js](https://nodejs.org/) (v22.13.0 or higher)
 - [npm](https://www.npmjs.com/)
 
 ## Getting Started
@@ -30,10 +30,16 @@ In this project, you can use the following NPM scripts to perform various tasks:
 
 ### 1. Linting
 
-You can use ESLint to check and automatically fix coding style issues in your code.
+Use ESLint to validate the codebase without modifying files.
 
 ```bash
 npm run lint
+```
+
+To automatically fix lint issues when possible, run:
+
+```bash
+npm run lint:fix
 ```
 
 ### 2. Preparing Husky

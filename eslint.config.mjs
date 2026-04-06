@@ -24,12 +24,7 @@ export default [
       '**/.vscode',
     ],
   },
-  ...compat.extends(
-    'eslint:recommended',
-    'plugin:prettier/recommended',
-    'plugin:node/recommended',
-    'plugin:cypress/recommended',
-  ),
+  ...compat.extends('eslint:recommended', 'plugin:prettier/recommended'),
   {
     plugins: {
       prettier,
@@ -40,7 +35,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...cypress.environments.globals.globals,
+        ...cypress.configs.globals.languageOptions.globals,
       },
 
       ecmaVersion: 'latest',
@@ -48,16 +43,8 @@ export default [
     },
 
     rules: {
+      ...cypress.configs.recommended.rules,
       'prettier/prettier': 'error',
-      'node/no-exports-assign': 'off',
-      'node/no-deprecated-api': 'off',
-      'node/no-missing-require': 'off',
-      'node/no-extraneous-require': 'off',
-      'node/no-unsupported-features/es-syntax': 'off',
-      'node/no-unpublished-import': 'off',
-      'node/no-unpublished-require': 'off',
-      'node/no-unsupported-features/es-builtins': 'off',
-      'node/no-unsupported-features/node-builtins': 'off',
       'cypress/no-assigning-return-values': 'error',
       'cypress/no-unnecessary-waiting': 'warn',
       'cypress/assertion-before-screenshot': 'warn',
